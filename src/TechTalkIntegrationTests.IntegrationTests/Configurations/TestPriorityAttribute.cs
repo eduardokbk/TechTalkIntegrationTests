@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace TechTalkIntegrationTests.IntegrationTests.Configurations
+{
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    public class TestPriorityAttribute : Attribute
+    {
+        public int Priority { get; private set; }
+
+        public TestPriorityAttribute(int priority) => Priority = priority;
+    }
+}

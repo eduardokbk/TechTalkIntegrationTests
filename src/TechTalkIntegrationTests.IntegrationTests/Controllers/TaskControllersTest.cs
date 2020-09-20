@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +15,55 @@ using Xunit;
 
 namespace TechTalkIntegrationTests.IntegrationTests.Controllers
 {
+    [TestCaseOrderer("TechTalkIntegrationTests.IntegrationTests.Configurations.PriorityOrderer", "TechTalkIntegrationTests.IntegrationTests")]
     public class TaskControllersTest : BaseIntegrationTest
     {
-        [Fact]
+        [Fact, TestPriority(0)]
+        public async Task Get_WithoutDataInDatabase_ShouldReturnEmptyList()
+        {
+            // Arrange
+            var url = "api/task";
+
+            // Act
+            var response = await _httpClient.GetAsync(url);
+
+            //Assert
+            response.EnsureSuccessStatusCode();
+
+            var content = JsonConvert.DeserializeObject<List<TaskForResponseDto>>(await response.Content.ReadAsStringAsync());
+
+            content.Should().BeEmpty();
+        }
+
+        [Fact, TestPriority(1)]
+        public async Task WithDataInDatabase_ShouldReturnIt()
+        {
+            // Arrange
+            var url = "api/task";
+
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+            var id3 = Guid.NewGuid();
+            await CreateDataAsync(new TaskDomain(id1, "get test", Priority.High, true));
+            await CreateDataAsync(new TaskDomain(id2, "get test", Priority.Low, true));
+            await CreateDataAsync(new TaskDomain(id3, "get test", Priority.Medium, false));
+
+
+            // Act
+            var response = await _httpClient.GetAsync(url);
+
+            //Assert
+            response.EnsureSuccessStatusCode();
+
+            var content = JsonConvert.DeserializeObject<List<TaskForResponseDto>>(await response.Content.ReadAsStringAsync());
+
+            content.Should().HaveCount(3);
+            content.Select(x => x.Id).Should().Contain(id1);
+            content.Select(x => x.Id).Should().Contain(id2);
+            content.Select(x => x.Id).Should().Contain(id3);
+        }
+
+        [Fact, TestPriority(2)]
         public async Task Create_WithValidDto_ShouldCreateWithSuccess()
         {
             // Arrange
@@ -42,7 +88,23 @@ namespace TechTalkIntegrationTests.IntegrationTests.Controllers
             id.Should().NotBe(Guid.Empty);
         }
 
-        [Fact]
+        [Fact, TestPriority(3)]
+        public async Task Create_WithInvalidDto_ShouldReturnError()
+        {
+            // Arrange
+            var url = "api/task";
+            var dto = new TaskForCreationDto();
+
+            var serialiedDto = new StringContent(JsonConvert.SerializeObject(dto), Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await _httpClient.PostAsync(url, serialiedDto);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        }
+
+        [Fact, TestPriority(4)]
         public async Task Update_WithValidDto_ShouldUpdateWithSuccess()
         {
             // Arrange
@@ -70,7 +132,34 @@ namespace TechTalkIntegrationTests.IntegrationTests.Controllers
             (await GetDataAsync<TaskDomain>(id)).Description.Should().Be(taskDto.Description);
         }
 
-        [Fact]
+        [Fact, TestPriority(5)]
+        public async Task Update_WithInvalidDto_ShouldReturnError()
+        {
+            // Arrange
+            var taskDto = new TaskForCreationDto
+            {
+                Completed = false,
+                Description = "integration test",
+                Priority = (int)Priority.Low
+            };
+
+            var id = Guid.NewGuid();
+            await CreateDataAsync(new TaskDomain(id, "test update", Priority.High, true));
+
+            var url = $"api/task/{id}";
+
+            taskDto.Description = "";
+
+            var serialiedDto = new StringContent(JsonConvert.SerializeObject(taskDto), Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await _httpClient.PutAsync(url, serialiedDto);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        }
+
+        [Fact, TestPriority(6)]
         public async Task Complete_WithValidId_ShouldCompleteTask()
         {
             // Arrange
@@ -86,23 +175,6 @@ namespace TechTalkIntegrationTests.IntegrationTests.Controllers
             response.EnsureSuccessStatusCode();
 
             (await GetDataAsync<TaskDomain>(id)).Completed.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task Get_WithDataInDatabase_ShouldReturnIt()
-        {
-            // Arrange
-            var url = "api/task";
-
-            // Act
-            var response = await _httpClient.GetAsync(url);
-
-            //Assert
-            response.EnsureSuccessStatusCode();
-
-            var content = JsonConvert.DeserializeObject<List<TaskForResponseDto>>(await response.Content.ReadAsStringAsync());
-
-            content.Should().NotBeEmpty();
         }
     }
 }

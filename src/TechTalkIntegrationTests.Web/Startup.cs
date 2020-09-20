@@ -49,12 +49,6 @@ namespace TechTalkIntegrationTests.Web
 
             app.UseCors(option => option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetRequiredService<MainContext>();
-                context.Database.Migrate();
-            }
-
             app.UseHttpsRedirection();
 
             app.UseRouting();

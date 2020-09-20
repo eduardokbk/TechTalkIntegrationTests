@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,7 +22,15 @@ namespace TechTalkIntegrationTests.IntegrationTests.Configurations
             var appFactory = new WebApplicationFactory<Startup>()
                 .WithWebHostBuilder(builder =>
                 {
-                  
+                    builder.ConfigureServices(services =>
+                    {
+                        services.RemoveAll(typeof(DbContextOptions<MainContext>));
+
+                        services.AddDbContext<MainContext>(options =>
+                        {
+                            options.UseInMemoryDatabase("InMemoryDbForTesting");
+                        });
+                    });
                 });
 
             _httpClient = appFactory.CreateClient();
@@ -41,10 +49,10 @@ namespace TechTalkIntegrationTests.IntegrationTests.Configurations
             await _mainContext.SaveChangesAsync();
         }
 
-        protected async Task<TEntity> GetDataAsync<TEntity>(Guid id) 
+        protected async Task<TEntity> GetDataAsync<TEntity>(Guid id)
             where TEntity : BaseEntity
         {
-          return  await _mainContext.Set<TEntity>().AsNoTracking().FirstAsync(x=> x.Id == id);
+            return await _mainContext.Set<TEntity>().AsNoTracking().FirstAsync(x => x.Id == id);
         }
     }
 }
