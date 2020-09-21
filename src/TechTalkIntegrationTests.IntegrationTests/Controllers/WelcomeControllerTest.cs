@@ -7,6 +7,10 @@ namespace TechTalkIntegrationTests.IntegrationTests.Controllers
 {
     public class WelcomeControllerTest : BaseIntegrationTest
     {
+        public WelcomeControllerTest(BaseTestFixture fixture) : base(fixture)
+        {
+        }
+
         [Fact]
         public async Task Get_ShouldReturnWelcomeWithSucces()
         {

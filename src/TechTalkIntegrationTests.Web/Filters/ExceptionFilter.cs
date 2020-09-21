@@ -13,7 +13,9 @@ namespace TechTalkIntegrationTests.Web.Filters
                 message = "A server error occurred.",
                 detailedMessage = context.Exception.Message
             });
+            result.StatusCode = 500;
             context.Result = result;
+            context.HttpContext.Response.StatusCode = result.StatusCode.Value;
         }
     }
 }

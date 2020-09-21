@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -7,27 +6,32 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalkIntegrationTests.Domain.Models.Entities;
 using TechTalkIntegrationTests.Infrastructure.Context;
-using TechTalkIntegrationTests.Web;
+using Xunit;
 
 namespace TechTalkIntegrationTests.IntegrationTests.Configurations
 {
-    public class BaseIntegrationTest
+    [Collection("base integration test collection")]
+    public abstract class BaseIntegrationTest
     {
-        protected readonly HttpClient _httpClient;
-        protected readonly MainContext _mainContext;
         private readonly IServiceScope _serviceScope;
+        protected readonly HttpClient _httpClient;
+        protected readonly MainContext _context;
+        protected readonly BaseTestFixture _fixture;
 
-        public BaseIntegrationTest()
+        protected BaseIntegrationTest(BaseTestFixture fixture)
         {
-            var appFactory = new WebApplicationFactory<Startup>()
-                .WithWebHostBuilder(builder =>
-                {
+            _fixture = fixture;
+            _httpClient = _fixture.HttpClient;
+            _serviceScope = _fixture.ServiceScope;
+            _context = _fixture.Context;
                   
-                });
+            ClearDb().Wait();
+        }
 
-            _httpClient = appFactory.CreateClient();
-            _serviceScope = appFactory.Server.Services.CreateScope();
-            _mainContext = GetService<MainContext>();
+        private async Task ClearDb()
+        {
+            _context.RemoveRange(_context.Set<TaskDomain>());
+            await _context.SaveChangesAsync();
         }
 
         protected TService GetService<TService>()
@@ -37,14 +41,14 @@ namespace TechTalkIntegrationTests.IntegrationTests.Configurations
 
         protected async Task CreateDataAsync<TEntity>(TEntity entity)
         {
-            await _mainContext.AddAsync(entity);
-            await _mainContext.SaveChangesAsync();
+            await _context.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
         protected async Task<TEntity> GetDataAsync<TEntity>(Guid id) 
             where TEntity : BaseEntity
         {
-          return  await _mainContext.Set<TEntity>().AsNoTracking().FirstAsync(x=> x.Id == id);
+            return await _context.Set<TEntity>().AsNoTracking().FirstAsync(x => x.Id == id);
         }
     }
 }
