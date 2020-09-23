@@ -14,6 +14,7 @@ namespace TechTalkIntegrationTests.Web.Filters
                 detailedMessage = context.Exception.Message
             });
             context.Result = result;
+            context.HttpContext.Response.StatusCode = 500;
         }
     }
 }

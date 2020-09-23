@@ -13,10 +13,12 @@ namespace TechTalkIntegrationTests.Application.Services
     public class TaskAppService : ITaskAppService
     {
         private readonly ITaskRepository _repository;
+        private readonly ITwitterClientService _twitterClient;
 
-        public TaskAppService(ITaskRepository repository)
+        public TaskAppService(ITaskRepository repository, ITwitterClientService twitterClient)
         {
             _repository = repository;
+            _twitterClient = twitterClient;
         }
 
         public async Task<List<TaskForResponseDto>> GetAllAsync()
@@ -65,6 +67,8 @@ namespace TechTalkIntegrationTests.Application.Services
             task.Complete();
             _repository.Update(task);
             await _repository.SaveChangesAsync();
+
+            await _twitterClient.PostTweetAsync("Task completed! \r \n #TechTalkIntegrationTest");
         }
 
         public async Task DeleteAsync(Guid id)

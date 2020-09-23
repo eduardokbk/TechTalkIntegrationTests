@@ -9,6 +9,7 @@ using TechTalkIntegrationTests.Domain.Models.Repositories;
 using TechTalkIntegrationTests.Domain.Models.Services;
 using TechTalkIntegrationTests.Infrastructure.Context;
 using TechTalkIntegrationTests.Infrastructure.Repositories;
+using TechTalkIntegrationTests.Infrastructure.Services;
 using TechTalkIntegrationTests.Web.Filters;
 
 namespace TechTalkIntegrationTests.Web
@@ -38,6 +39,7 @@ namespace TechTalkIntegrationTests.Web
         {
             services.AddTransient<ITaskAppService, TaskAppService>();
             services.AddTransient<ITaskRepository, TaskRepository>();
+            services.AddTransient<ITwitterClientService, TwitterClientService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

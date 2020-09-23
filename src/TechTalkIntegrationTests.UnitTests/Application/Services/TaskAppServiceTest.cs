@@ -8,6 +8,7 @@ using TechTalkIntegrationTests.Domain.Models.Dtos.Tasks;
 using TechTalkIntegrationTests.Domain.Models.Entities;
 using TechTalkIntegrationTests.Domain.Models.Enums;
 using TechTalkIntegrationTests.Domain.Models.Repositories;
+using TechTalkIntegrationTests.Domain.Models.Services;
 using Xunit;
 
 namespace TechTalkIntegrationTests.UnitTests.Application.Services
@@ -15,12 +16,14 @@ namespace TechTalkIntegrationTests.UnitTests.Application.Services
     public class TaskAppServiceTest
     {
         private readonly ITaskRepository _repository;
+        private readonly ITwitterClientService _twitterClientService;
         private readonly TaskAppService _appService;
 
         public TaskAppServiceTest()
         {
             _repository = Substitute.For<ITaskRepository>();
-            _appService = new TaskAppService(_repository);
+            _twitterClientService = Substitute.For<ITwitterClientService>();
+            _appService = new TaskAppService(_repository, _twitterClientService);
         }
 
         [Fact]
@@ -123,7 +126,7 @@ namespace TechTalkIntegrationTests.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task CompleteAsync_WithValidId_ShouldCompleteTask()
+        public async Task CompleteAsync_WithValidId_ShouldCompleteTaskAndTweet()
         {
             // Arrange
             var taskDomain = new TaskDomain(Guid.NewGuid(), "old", Priority.High, false);
@@ -139,6 +142,7 @@ namespace TechTalkIntegrationTests.UnitTests.Application.Services
                                                                    x.Completed &&
                                                                    x.Active == taskDomain.Active &&
                                                                    x.Id == taskDomain.Id));
+            await _twitterClientService.Received(1).PostTweetAsync(Arg.Is("Task completed! \r \n #TechTalkIntegrationTest"));
             await _repository.Received(1).SaveChangesAsync();
         }
 
