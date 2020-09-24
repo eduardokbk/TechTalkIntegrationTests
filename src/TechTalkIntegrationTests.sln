@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5.Tests", "5.Tests", "{C20E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechTalkIntegrationTests.UnitTests", "TechTalkIntegrationTests.UnitTests\TechTalkIntegrationTests.UnitTests.csproj", "{23075751-F1E3-4858-BBC1-4E77DFABA3CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTalkzaoIntegrationTest", "TechTalkzaoIntegrationTest\TechTalkzaoIntegrationTest.csproj", "{53431F3A-B655-4E86-B6CC-B9213EDEAA23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{23075751-F1E3-4858-BBC1-4E77DFABA3CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23075751-F1E3-4858-BBC1-4E77DFABA3CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23075751-F1E3-4858-BBC1-4E77DFABA3CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53431F3A-B655-4E86-B6CC-B9213EDEAA23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53431F3A-B655-4E86-B6CC-B9213EDEAA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53431F3A-B655-4E86-B6CC-B9213EDEAA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53431F3A-B655-4E86-B6CC-B9213EDEAA23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{8643EC0B-FC77-453A-AAC7-7F73DDB3AEF3} = {721FE38F-0CCD-4388-BC19-B2157AB32BCB}
 		{FFF91B03-6FFA-415D-B926-D8F55446D86B} = {BFCB6D4B-8EA2-4F2B-B1B7-A9704489269C}
 		{23075751-F1E3-4858-BBC1-4E77DFABA3CA} = {C20EA02B-F681-4993-855D-D9DC3239340C}
+		{53431F3A-B655-4E86-B6CC-B9213EDEAA23} = {C20EA02B-F681-4993-855D-D9DC3239340C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF46B2BC-AF82-4E90-A5CB-84C82243EFCA}
