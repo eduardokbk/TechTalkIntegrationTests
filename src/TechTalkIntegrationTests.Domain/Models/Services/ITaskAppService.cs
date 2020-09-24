@@ -10,7 +10,7 @@ namespace TechTalkIntegrationTests.Domain.Models.Services
         Task<List<TaskForResponseDto>> GetAllAsync();
         Task<Guid> CreateAsync(TaskForCreationDto taskForCreation);
         Task UpdateAsync(Guid id, TaskForCreationDto taskForCreation);
-        Task CompleteAsync(Guid id);
+        Task<string> CompleteAsync(Guid id);
         Task DeleteAsync(Guid id);
     }
 }

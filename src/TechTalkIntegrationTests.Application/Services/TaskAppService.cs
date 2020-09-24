@@ -60,7 +60,7 @@ namespace TechTalkIntegrationTests.Application.Services
             await _repository.SaveChangesAsync();
         }
 
-        public async Task CompleteAsync(Guid id)
+        public async Task<string> CompleteAsync(Guid id)
         {
             TaskDomain task = await GetAndValidateAsync(id);
 
@@ -68,7 +68,13 @@ namespace TechTalkIntegrationTests.Application.Services
             _repository.Update(task);
             await _repository.SaveChangesAsync();
 
-            await _twitterClient.PostTweetAsync("Task completed! \r \n #TechTalkIntegrationTest");
+            var message = "Task completed! \r \n #TechTalkIntegrationTest";
+            var success = await _twitterClient.PostTweetAsync(message);
+
+            if (success)
+                return message;
+            else
+                return "Task completed! \r \n Tweet not done";
         }
 
         public async Task DeleteAsync(Guid id)

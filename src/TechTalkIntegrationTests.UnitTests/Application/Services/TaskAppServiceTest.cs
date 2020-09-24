@@ -133,8 +133,10 @@ namespace TechTalkIntegrationTests.UnitTests.Application.Services
 
             _repository.GetByIdAsNoTrackingAsync(Arg.Is(taskDomain.Id)).ReturnsForAnyArgs(taskDomain);
 
+            _twitterClientService.PostTweetAsync(default).ReturnsForAnyArgs(true);
+
             // Act
-            await _appService.CompleteAsync(taskDomain.Id);
+            var result = await _appService.CompleteAsync(taskDomain.Id);
 
             // Assert
             _repository.Received(1).Update(Arg.Is<TaskDomain>(x => x.Description == taskDomain.Description &&
@@ -144,6 +146,31 @@ namespace TechTalkIntegrationTests.UnitTests.Application.Services
                                                                    x.Id == taskDomain.Id));
             await _twitterClientService.Received(1).PostTweetAsync(Arg.Is("Task completed! \r \n #TechTalkIntegrationTest"));
             await _repository.Received(1).SaveChangesAsync();
+
+            result.Should().Be("Task completed! \r \n #TechTalkIntegrationTest");
+        }
+
+        [Fact]
+        public async Task CompleteAsync_WithTweetError_ShouldCompleteTaskAndReturnErrorMessage()
+        {
+            // Arrange
+            var taskDomain = new TaskDomain(Guid.NewGuid(), "old", Priority.High, false);
+
+            _repository.GetByIdAsNoTrackingAsync(Arg.Is(taskDomain.Id)).ReturnsForAnyArgs(taskDomain);
+
+            // Act
+            var result = await _appService.CompleteAsync(taskDomain.Id);
+
+            // Assert
+            _repository.Received(1).Update(Arg.Is<TaskDomain>(x => x.Description == taskDomain.Description &&
+                                                                   x.Priority == taskDomain.Priority &&
+                                                                   x.Completed &&
+                                                                   x.Active == taskDomain.Active &&
+                                                                   x.Id == taskDomain.Id));
+            await _twitterClientService.Received(1).PostTweetAsync(Arg.Is("Task completed! \r \n #TechTalkIntegrationTest"));
+            await _repository.Received(1).SaveChangesAsync();
+
+            result.Should().Be("Task completed! \r \n Tweet not done");
         }
 
         [Fact]

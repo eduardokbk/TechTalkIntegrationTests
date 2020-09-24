@@ -40,8 +40,7 @@ namespace TechTalkIntegrationTests.Web.Controllers
         [Route("{id}/complete")]
         public async Task<IActionResult> Patch(Guid id)
         {
-            await _appService.CompleteAsync(id);
-            return NoContent();
+            return Ok(await _appService.CompleteAsync(id));
         }
 
         [HttpDelete]

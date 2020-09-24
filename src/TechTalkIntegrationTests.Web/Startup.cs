@@ -11,6 +11,8 @@ using TechTalkIntegrationTests.Infrastructure.Context;
 using TechTalkIntegrationTests.Infrastructure.Repositories;
 using TechTalkIntegrationTests.Infrastructure.Services;
 using TechTalkIntegrationTests.Web.Filters;
+using Tweetinvi;
+using Tweetinvi.Models;
 
 namespace TechTalkIntegrationTests.Web
 {
@@ -33,6 +35,7 @@ namespace TechTalkIntegrationTests.Web
                 opt.Filters.Add<ExceptionFilter>();
             });
             services.AddDbContext<MainContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("tech-talk-connection")));
+            Auth.SetCredentials(new TwitterCredentials("1OgklADZZ0dmsfL0BlEjSIcLH", "eHgEjBh55vF20xXvU7j6JuCCA5c2qhFtE1DSxXVadPbDfaJC9d", "764558540497362949-yxvNeGPhwsNE02UQETiY3mfHoD01OXt", "TvC1qQ6TSpBMuHYZRjy8mTKiQmlMJoSZcaIBuMfiE29PE"));
         }
 
         private void ConfigureDependencies(IServiceCollection services)
@@ -49,13 +52,13 @@ namespace TechTalkIntegrationTests.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(option => option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<MainContext>();
                 context.Database.Migrate();
             }
+
+            app.UseCors(option => option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
             app.UseHttpsRedirection();
 
